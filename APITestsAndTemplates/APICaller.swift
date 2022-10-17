@@ -19,7 +19,7 @@ class APICaller {
             
             // check for error
             guard let resultData = resultData, error == nil else {
-                completion(.failure(APIError(type: .unknown)))
+                completion(.failure(.unknown))
                 return
             }
             
@@ -33,7 +33,7 @@ class APICaller {
             
             // check if was parsed correctly
             guard let decodedResult = decodedResult  else {
-                completion(.failure(APIError(type: .badResponse)))
+                completion(.failure(.badResponse))
                 return
             }
             
@@ -75,19 +75,42 @@ struct User: Codable {
     var age: String
 }
 
-enum APIErrorType: Error {
-    case internalError
-    case badRequest
-    case badResponse
-    case unknown
+enum APIError: Error {
+        case internalError
+        case badRequest
+        case badResponse
+        case unknown
 }
 
-struct APIError: LocalizedError {
-    var errorDescription: String?
-    var errorType: APIErrorType
-    
-    init(type: APIErrorType) {
-        errorType = type
-        errorDescription = errorType.localizedDescription
+// For each error type return the appropriate description
+extension APIError: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .internalError:
+            return "The provided password is not valid."
+        case .badRequest:
+            return "The specified item could not be found."
+        case .badResponse:
+            return "Internal server error"
+        case .unknown:
+            return "An unexpected error occurred."
+        }
     }
 }
+
+//enum APIErrorType: Error {
+//    case internalError
+//    case badRequest
+//    case badResponse
+//    case unknown
+//}
+
+//struct APIError: LocalizedError {
+//    var errorDescription: String?
+//    var errorType: APIErrorType
+//
+//    init(type: APIErrorType) {
+//        errorType = type
+//        errorDescription = errorType.localizedDescription
+//    }
+//}
